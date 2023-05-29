@@ -1,0 +1,61 @@
+
+
+% start S
+
+S[SEM=(?np2 + ?vp2)] -> NP[SEM=?np2] VP[SEM=?vp2]
+
+VP[SEM=(?vp2 + BREAK_W + WHERE + ?pp)] -> Sal_v[SEM=?vp2] PP[SEM=?pp]
+VP[SEM=?vp2] -> V[SEM=?vp2]  | Sal_v[SEM=?vp2] | Dep_v[SEM=?vp2] 
+VP[SEM=(?v + ?vp)] -> V[SEM=?v] VP[SEM=?vp]
+VP[SEM=(?v + BREAK_W + WHERE + ?n + ?vp)] -> Dep_v[SEM=?v] N[SEM=?n] VP[SEM=?vp]
+
+# Last and first name handler
+VP[SEM=(?v + BREAK_W + WHERE + ?la +?na1 + ?na2)] -> V[SEM=?v] last_a[SEM=?la] name_a[SEM=?na1] name_b[SEM=?na2]
+VP[SEM=(?v +  BREAK_W + WHERE + ?la +?na1 + ?na2)] -> V[SEM=?v] first_a[SEM=?la] name_a[SEM=?na1] name_b[SEM=?na2]
+
+VP[SEM=(?paid_v + ?v)] -> Paid_v[SEM=?paid_v] V[SEM=?v] 
+VP[SEM=(?paid_v  + ?v1 +  BREAK_W + WHERE + ?n + ?v2)] -> Paid_v[SEM=?paid_v]  V[SEM=?v1] N[SEM=?n] V[SEM=?v2]
+
+VP[SEM=(?iv + ?v)] -> IV[SEM=?iv] V[SEM=?v]
+
+PP[SEM=(?n + ?v)] -> N[SEM=?n] V[SEM=?v]
+
+# Handling Average
+NP[SEM=(?det + ?avg)] -> Det[SEM=?det] AVG[SEM=?avg] | Det[SEM=?det] Max[SEM=?avg] | Det[SEM=?det] Min[SEM=?avg] | Det[SEM=?det] Con_t[SEM=?avg] 
+
+NP[SEM=(?det)] -> Det_2[SEM=?det]
+
+# SELECT Clause
+Det[SEM='BREAK_S SELECT'] -> 'Which' | 'What' | 'How' | 'Who' | 'which' | 'what' | 'how' | 'who'
+Det_2[SEM='BREAK_S SELECT *'] -> 'Which' | 'What' | 'How' | 'Who'| 'Who' | 'which' | 'what' | 'how' | 'who'
+
+# Columns name clauses
+V[SEM='BREAK_F FROM salaries'] ->  'salary' | 'salaries'
+V[SEM='BREAK_F FROM titles'] ->  'title' | 'titles'
+V[SEM='BREAK_F FROM employees'] ->  'employee' | 'employees' | 'person'
+V[SEM='BREAK_F FROM departments, dept_emp'] ->  'department' | 'departments'
+
+# avg,min,max select variable
+Sal_v[SEM='(salary)  BREAK_F FROM salaries'] -> 'salary' | 'salaries'
+Dep_v[SEM='(employees.emp_no), dept_emp.dept_no BREAK_F FROM employees'] -> 'employee' | 'employees' | 'person'
+Paid_v[SEM='(salary) first_name, last_name, employees.emp_no BREAK_F FROM salaries BREAK_W where employees.emp_no = salaries.emp_no'] -> 'paid'
+
+# WHERE Clause
+N[SEM='departments.dept_name = "development" and dept_emp.dept_no = departments.dept_no   and dept_emp.emp_no = TMP_1.emp_no'] -> 'development'
+
+N[SEM='departments.dept_name = "dept_emp.emp_no = employees.emp_no and departments.dept_name = "development"'] -> 'development'
+
+N[SEM=' employees.emp_no = salaries.emp_no and departments.dept_no = dept_emp.dept_no and dept_emp.emp_no = salaries.emp_no and departments.dept_name= "development"'] -> 'development'
+
+# Average , Min, Max, Count
+AVG[SEM='AVG'] -> 'average' | 'avg'
+Max[SEM='MAX'] -> 'maximum' | 'max' | 'highest'
+Min[SEM='MIN'] -> 'minimum' | 'min' | 'lowest'
+Con_t[SEM='COUNT'] -> 'many' | 'much'
+
+# Helpers
+last_a[SEM='last_name'] -> 'last'
+name_a[SEM=''] -> 'name'
+name_b[SEM='= "Guana"'] -> 'Guana'
+name_b[SEM='= "Facello"'] -> 'Facello'
+first_a[SEM='first_name'] -> 'first'
